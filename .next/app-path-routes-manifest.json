@@ -1,0 +1,22 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/accounts/cashflow/page": "/accounts/cashflow",
+  "/accounts/investment/holding/page": "/accounts/investment/holding",
+  "/accounts/investment/overview/page": "/accounts/investment/overview",
+  "/accounts/investment/trading/page": "/accounts/investment/trading",
+  "/accounts/liability/page": "/accounts/liability",
+  "/accounts/saving/page": "/accounts/saving",
+  "/dashboard/page": "/dashboard",
+  "/favicon.ico/route": "/favicon.ico",
+  "/income/page": "/income",
+  "/outcome/page": "/outcome",
+  "/page": "/",
+  "/report/cashflow/page": "/report/cashflow",
+  "/report/investment/page": "/report/investment",
+  "/report/liability/page": "/report/liability",
+  "/report/monthly/page": "/report/monthly",
+  "/report/saving/page": "/report/saving",
+  "/settings/page": "/settings",
+  "/transfer/page": "/transfer"
+}

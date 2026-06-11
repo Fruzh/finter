@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/accounts/layout,_N_T_/accounts/cashflow/layout,_N_T_/accounts/cashflow/page,_N_T_/accounts/cashflow"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/accounts/cashflow/__PAGE__",
+    "/accounts/cashflow",
+    "/accounts",
+    "/_index",
+    "/_head"
+  ]
+}

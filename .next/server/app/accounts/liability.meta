@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/accounts/layout,_N_T_/accounts/liability/layout,_N_T_/accounts/liability/page,_N_T_/accounts/liability"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/accounts/liability/__PAGE__",
+    "/accounts/liability",
+    "/accounts",
+    "/_index",
+    "/_head"
+  ]
+}

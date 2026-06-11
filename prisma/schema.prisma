@@ -1,0 +1,314 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// =====================
+// ENUM
+// =====================
+
+enum AccountType {
+  CASH
+  BANK
+  E_WALLET
+  E_MONEY
+  INVESTMENT
+  LIABILITY
+}
+
+enum AccountBucket {
+  CASHFLOW
+  SAVING
+  INVESTMENT
+  LIABILITY
+}
+
+enum EntryDirection {
+  DEBIT
+  CREDIT
+}
+
+enum TradeType {
+  BUY
+  SELL
+}
+
+enum AssetClass {
+  CRYPTO
+  STOCK
+  BOND
+  DEPOSIT
+  ETF
+  REAL_STATE
+  COLLECTIBLE
+  METALS
+  FOREX
+  OTHER
+}
+
+enum LiabilityCategory {
+  BUNGA
+  KPR
+  KARTU_KREDIT
+  PINJAMAN
+  CICILAN
+  DEPRESIASI_ASET
+  LAINNYA
+}
+
+
+
+// =====================
+// CORE ACCOUNT (STATE)
+// =====================
+
+model Account {
+  id               Int            @id @default(autoincrement())
+  name             String
+  type             AccountType
+  bucket           AccountBucket
+  currency         String         // IDR, USD, dll
+  balance          Decimal        @default(0)
+  isActive         Boolean        @default(true)
+  supportedClasses String         @default("")
+
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  ledgerEntries LedgerEntry[]
+  incomes       Income[]
+  outcomes      Outcome[]
+  transfersFrom BalanceTransfer[] @relation("TransferFrom")
+  transfersTo   BalanceTransfer[] @relation("TransferTo")
+  trades        InvestmentTrade[]
+  positions     InvestmentPosition[]
+}
+
+
+// =====================
+// LEDGER (SOURCE OF TRUTH)
+// =====================
+
+model LedgerEntry {
+  id        Int            @id @default(autoincrement())
+  date      DateTime
+  accountId Int
+  direction EntryDirection
+  amount    Decimal
+  currency  String
+  refType   String?
+  refId     Int?
+  note      String?
+
+  account   Account        @relation(fields: [accountId], references: [id])
+
+  createdAt DateTime       @default(now())
+}
+
+
+// =====================
+// INCOME
+// =====================
+
+model Income {
+  id        Int              @id @default(autoincrement())
+  date      DateTime
+  typeId    Int
+  sourceId  Int
+  accountId Int
+  amount    Decimal
+  note      String?
+  assetId   Int?
+  asset     InvestmentAsset? @relation(fields: [assetId], references: [id])
+
+  account   Account          @relation(fields: [accountId], references: [id])
+}
+
+
+// =====================
+// OUTCOME
+// =====================
+
+model Outcome {
+  id          Int      @id @default(autoincrement())
+  date        DateTime
+  categoryId  Int
+  subcategoryId Int?
+  accountId   Int
+  amount      Decimal
+  note        String?
+
+  account     Account  @relation(fields: [accountId], references: [id])
+}
+
+
+// =====================
+// TRANSFER
+// =====================
+
+model BalanceTransfer {
+  id            Int      @id @default(autoincrement())
+  date          DateTime
+  fromAccountId Int
+  toAccountId   Int
+  amount        Decimal
+  feeFixed      Decimal?
+  feePercent    Decimal?
+  note          String?
+
+  fromAccount Account @relation("TransferFrom", fields: [fromAccountId], references: [id])
+  toAccount   Account @relation("TransferTo", fields: [toAccountId], references: [id])
+}
+
+
+// =====================
+// ENUM VALUES (CONFIGURABLE)
+// =====================
+
+model EnumValue {
+  id          Int     @id @default(autoincrement())
+  category    String
+  value       String
+  order       Int?    @default(0)
+  description String?
+
+  parentId    Int?
+  parent      EnumValue? @relation("EnumParent", fields: [parentId], references: [id])
+  children    EnumValue[] @relation("EnumParent")
+
+  @@unique([category, value])
+}
+
+
+// =====================
+// INVESTMENT ASSET
+// =====================
+
+model InvestmentAsset {
+  id            Int                 @id @default(autoincrement())
+  symbol        String              @unique // BTC, ETH, MEMECOIN
+  name          String
+  class         AssetClass          @default(STOCK)
+  baseCurrency  String              // USD
+  isActive      Boolean             @default(true)
+
+  positions     InvestmentPosition[]
+  trades        InvestmentTrade[]
+  incomes       Income[]
+  yieldConfig   AssetYieldConfig?
+  valuationHistory AssetValuationHistory[]
+}
+
+
+// =====================
+// INVESTMENT POSITION (HOLDING)
+// =====================
+
+model InvestmentPosition {
+  id        Int      @id @default(autoincrement())
+  accountId Int
+  assetId   Int
+  quantity  Decimal
+  avgPrice  Decimal
+
+  account Account @relation(fields: [accountId], references: [id])
+  asset   InvestmentAsset @relation(fields: [assetId], references: [id])
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([accountId, assetId])
+}
+
+
+// =====================
+// INVESTMENT TRADE (BUY/SELL EVENT)
+// =====================
+
+model InvestmentTrade {
+  id          Int      @id @default(autoincrement())
+  date        DateTime
+  accountId   Int
+  assetId     Int
+  type        TradeType
+  quantity    Decimal
+  price       Decimal
+  fee         Decimal?
+  feeCurrency String?
+  total       Decimal
+  note        String?
+
+  account Account @relation(fields: [accountId], references: [id])
+  asset   InvestmentAsset @relation(fields: [assetId], references: [id])
+}
+
+// =====================
+// AI CHAT PERSISTENCE (STATE)
+// =====================
+
+model ChatMessage {
+  id        Int      @id @default(autoincrement())
+  role      String   // "user" atau "model"
+  text      String
+  createdAt DateTime @default(now())
+}
+
+// =====================
+// CURRENCY & EXCHANGE RATE
+// =====================
+
+model Currency {
+  id          Int           @id @default(autoincrement())
+  code        String        @unique // e.g. USD, IDR, JPY
+  symbol      String?       // e.g. $, Rp
+  description String?       // e.g. Indonesian Rupiah
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  
+  exchangeRate ExchangeRate?
+}
+
+model ExchangeRate {
+  id              Int       @id @default(autoincrement())
+  currencyId      Int       @unique
+  rate            Decimal   // Rate relative to USD base
+  source          String?
+  rateUpdatedAt   DateTime?
+  fetchedAt       DateTime  @default(now())
+  
+  currency        Currency  @relation(fields: [currencyId], references: [id])
+}
+
+model AssetYieldConfig {
+  id              Int             @id @default(autoincrement())
+  assetId         Int             @unique
+  asset           InvestmentAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  
+  rate            Decimal         // Yield/Coupon/Interest rate in % (e.g. 5.5 for 5.5%)
+  frequency       String          // "MONTHLY", "QUARTERLY", "SEMI_ANNUALLY", "ANNUALLY", "ON_MATURITY"
+  maturityDate    DateTime?       // Maturity date (null for stocks, set for deposits & bonds)
+  startDate       DateTime        // Date when yield accrual/investment starts
+  payoutDay       Int             @default(15) // Day of the month when coupon/interest is paid
+  principal       Decimal?        // Principal invested (especially for fixed deposits/bonds)
+  targetAccountId Int?            // Cash account (e.g. Bank Mandiri) that receives the payouts
+  inKind          Boolean         @default(false)
+}
+
+model AssetValuationHistory {
+  id        Int             @id @default(autoincrement())
+  assetId   Int
+  date      DateTime
+  price     Decimal
+  note      String?
+  
+  asset     InvestmentAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  createdAt DateTime        @default(now())
+}

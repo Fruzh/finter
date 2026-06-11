@@ -1,0 +1,22 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/accounts/cashflow/page": "app/accounts/cashflow/page.js",
+  "/accounts/investment/holding/page": "app/accounts/investment/holding/page.js",
+  "/accounts/investment/overview/page": "app/accounts/investment/overview/page.js",
+  "/accounts/investment/trading/page": "app/accounts/investment/trading/page.js",
+  "/accounts/liability/page": "app/accounts/liability/page.js",
+  "/accounts/saving/page": "app/accounts/saving/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/income/page": "app/income/page.js",
+  "/outcome/page": "app/outcome/page.js",
+  "/page": "app/page.js",
+  "/report/cashflow/page": "app/report/cashflow/page.js",
+  "/report/investment/page": "app/report/investment/page.js",
+  "/report/liability/page": "app/report/liability/page.js",
+  "/report/monthly/page": "app/report/monthly/page.js",
+  "/report/saving/page": "app/report/saving/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/transfer/page": "app/transfer/page.js"
+}
